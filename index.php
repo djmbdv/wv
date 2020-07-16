@@ -6,6 +6,7 @@ include_once  "auth.php";
     die();
   }
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
