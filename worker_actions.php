@@ -31,6 +31,23 @@ function is_jornada_started(){
 	$stmt->execute();
 	return $stmt->rowCount() == 1;
 }
+
+function jornada_has_finnished(){
+	session_start();
+	if(!isset($_SESSION['id']))return;
+	$id = $_SESSION['id'];
+	session_commit();
+	global $conn;
+	$stmt=$conn->prepare("SELECT * FROM `events` WHERE DATE(`start_at`) = CURDATE() and type='0' and worker = :id ");
+	$stmt->bindParam(":id",$id);
+	$stmt->execute();
+
+	if( $stmt->rowCount() != 1)return false;
+	$o = $stmt->fetchObject();
+	return $o->end_at != null;
+}
+
+
 function my_project(){
 	session_start();
 	if(!isset($_SESSION['project']))return;
