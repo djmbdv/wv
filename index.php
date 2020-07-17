@@ -1,6 +1,6 @@
 <?php
 include "con.php";
-include_once  "auth.php";
+require_once  "auth.php";
   if(!is_login()){
     header('location: login.php');
     die();
@@ -25,26 +25,13 @@ include_once  "auth.php";
       </nav>
       <a class="btn btn-outline-primary" href="logout.php">Logout</a>
 </div>
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Pausa</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Descripci&oacute;n de la pausa</p>
-        <textarea class="form-control"></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id="btn-pausa" class="btn btn-primary">Iniciar</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
+
+<?php
+
+if(!ami_admin()):
+  include_once "view_worker.php";
+else:
+ ?>
 <div class="container py-5">
   <div class="row">
 
@@ -77,7 +64,7 @@ include_once  "auth.php";
           <hr>
 
           <div class="col-md-6 col-xs-12  p-3">
-          <button class="btn btn-block btn-success">Iniciar</button>
+          <button class="btn btn-block btn-success" id="btn-jornada-start">Iniciar</button>
       		</div>
       		 <div class="col-md-6 col-xs-12  p-3">
           <button class="btn btn-block btn-danger">Finalizar</button>
@@ -193,7 +180,7 @@ include_once  "auth.php";
   $stmt->execute();
   foreach ($stmt->fetchAll() as $key => $value):
 ?>
-  <button class="btn btn-warning <?= $value['class']?>" data-toggle="modal" data-target="#exampleModal"><?=  $value['description'] ?></button>
+  <button class="btn btn-warning btn-pausa <?= $value['class']?>" ><?=  $value['description'] ?> </button>
 <?php
   endforeach;
 ?>
@@ -202,6 +189,9 @@ include_once  "auth.php";
 </div>
 </div>
 </div>
+<?php 
+endif;
+?>
 <script type="text/javascript" src="js/custom.js?8"></script>
 </body>
 </html>

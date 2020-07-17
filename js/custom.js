@@ -34,3 +34,7 @@ var i = setInterval(drawClock, 1000);
 function stop(){
   clearInterval(i);
 }
+
+$("#btn-jornada-star").click(e=>{
+
+});
