@@ -11,6 +11,8 @@ function start_event($type){
 	$stmt->bindParam(":type",$type);
 	$stmt->bindParam(":id", $id);
 	$stmt->execute();
+	$id = $conn->lastInsertId();
+	return $id;
 }
 
 function stop_event($event){
@@ -18,6 +20,7 @@ function stop_event($event){
 	$stmt= $conn->prepare("UPDATE events set end_at = current_timestamp() where id = :id;");
 	$stmt->bindParam(":id", $event);
 	$stmt->execute();
+	return $stmt->rowCount();
 }
 
 function is_jornada_started(){
@@ -30,6 +33,43 @@ function is_jornada_started(){
 	$stmt->bindParam(":id",$id);
 	$stmt->execute();
 	return $stmt->rowCount() == 1;
+}
+
+function get_current_jornada(){
+	session_start();
+	if(!isset($_SESSION['id']))return;
+	$id = $_SESSION['id'];
+	session_commit();
+	global $conn;
+	$stmt=$conn->prepare("SELECT * FROM `events` WHERE DATE(`start_at`) = CURDATE() and type='0' and worker = :id");
+	$stmt->bindParam(":id",$id);
+	$stmt->execute();
+	return ($stmt->rowCount() == 1)?$stmt->fetchObject()->id:0;
+}
+
+
+function is_in_pausa(){
+	session_start();
+	if(!isset($_SESSION['id']))return;
+	$id = $_SESSION['id'];
+	session_commit();
+	global $conn;
+	$stmt=$conn->prepare("SELECT * FROM `events` WHERE DATE(`start_at`) = CURDATE() and type <> '0' and worker = :id and end_at is null");
+	$stmt->bindParam(":id",$id);
+	$stmt->execute();
+	return $stmt->rowCount() > 0;
+}
+
+function get_latest_pausa(){
+	session_start();
+	if(!isset($_SESSION['id']))return;
+	$id = $_SESSION['id'];
+	session_commit();
+	global $conn;
+	$stmt=$conn->prepare("SELECT * FROM `events` WHERE DATE(`start_at`) = CURDATE() and type <> '0' and worker = :id and end_at is null");
+	$stmt->bindParam(":id",$id);
+	$stmt->execute();
+	return ($stmt->rowCount() > 0)?$stmt->fetchObject():0;
 }
 
 function jornada_has_finnished(){
@@ -75,7 +115,7 @@ function list_actions_today(){
 	$id = $_SESSION['id'];
 	session_commit();
 	global $conn;
-	$stmt=$conn->prepare("SELECT * FROM `events` left join event_types on event_types.id = events.type WHERE DATE(`start_at`) = CURDATE() and type='0' and worker = :id");
+	$stmt=$conn->prepare("SELECT * FROM `events` left join event_types on event_types.id = events.type WHERE DATE(`start_at`) = CURDATE()  and worker = :id");
 	$stmt->bindParam(":id",$id);
 	$stmt->execute();
 	$res = $stmt->fetchAll();
