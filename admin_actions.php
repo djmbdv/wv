@@ -29,10 +29,10 @@ function get_jornada($id){
 function get_horas_pausa($id){
 	global $conn;
 	$stmt = $conn->prepare("
-	select sum( if(end_at is null,time_to_sec(TIMEDIFF( time(current_timestamp()), time(start_at))),time_to_sec(TIMEDIFF( time(end_at), time(start_at))))) as horas_pausa  from events where worker = :id and DATE(`start_at`) = CURDATE() and type <> '0'");
+	select sum( if(end_at is null,time_to_sec(TIMEDIFF( time(current_timestamp()), time(start_at))),time_to_sec(TIMEDIFF( time(end_at), time(start_at))))) as horas_pausa, count(id) as num_pausas  from events where worker = :id and DATE(`start_at`) = CURDATE() and type <> '0'");
 	$stmt->bindParam(":id",$id);
 	$stmt->execute();
-	return $stmt->fetchObject()->horas_pausa;
+	return $stmt->fetchObject();
 }
 
 

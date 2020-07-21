@@ -161,7 +161,7 @@ foreach(all_workers_today() as $worker):
         <h2 class="h6 font-weight-bold text-center mb-4">Hora en Pausa</h2>
 
         <!-- Progress bar 2 -->
-        <div class="progress mx-auto" data-value='<?=  acotar_jornada(get_horas_pausa($w->id))  ?>'>
+        <div class="progress mx-auto" data-value='<?=  acotar_jornada(get_horas_pausa($w->id)->horas_pausa)  ?>'>
           <span class="progress-left">
                         <span class="progress-bar border-danger"></span>
           </span>
@@ -169,7 +169,7 @@ foreach(all_workers_today() as $worker):
                         <span class="progress-bar border-danger"></span>
           </span>
           <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-            <div class="h2 font-weight-bold"><?=  number_format((100 * get_horas_pausa($w->id)) / (8*3600),1)  ?><sup class="small">%</sup></div>
+            <div class="h2 font-weight-bold"><?=  number_format((100 * get_horas_pausa($w->id)->horas_pausa) / (8*3600),1)  ?><sup class="small">%</sup></div>
           </div>
         </div>
         <!-- END -->
@@ -177,7 +177,7 @@ foreach(all_workers_today() as $worker):
         <!-- Demo info-->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
-            <div class="h4 font-weight-bold mb-0">33</div><span class="small text-gray">Pausas Hoy</span>
+            <div class="h4 font-weight-bold mb-0"><?= get_horas_pausa($w->id)->num_pausas ?></div><span class="small text-gray">Pausas Hoy</span>
           </div>
           <div class="col-6">
             <div class="h4 font-weight-bold mb-0">60%</div><span class="small text-gray">Mayor Pausa</span>
