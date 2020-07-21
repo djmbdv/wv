@@ -15,6 +15,7 @@ function auth($username,$password){
 	$stmt->bindParam(":username",$username);
 	$stmt->execute();
 	$o =  $stmt->fetchObject();
+	if($stmt->rowCount()  == 0)return false;
 	$pass = $o->password;
 	$res = password_verify($password,$pass);
 	if($res){

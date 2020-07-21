@@ -121,7 +121,7 @@
   $stmt->execute();
   foreach ($stmt->fetchAll() as $key => $value):
 ?>
-  <button class="btn btn-warning btn-action btn-pausa <?= $value['class']?>"  type_event="<?=  $value['id'] ?>"><?=  $value['description'] ?> <span class="badge">34</span></button>
+  <button class="btn btn-warning btn-action btn-pausa <?= $value['class']?>"  type_event="<?=  $value['id'] ?>"><?=  $value['description'] ?></button>
 <?php
   endforeach;
 ?>

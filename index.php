@@ -6,7 +6,6 @@ require_once  "auth.php";
     die();
   }
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,23 +30,53 @@ require_once  "auth.php";
 
 <?php
 
+
 if(!ami_admin()):
   include_once "view_worker.php";
 else:
  ?>
 <div class="container py-5">
-  <div class="row">
-
-    <!-- For demo purpose -->
-    <div class="col-lg-12 mx-auto mb-5  text-center">
+  <div class="col-lg-12 mx-auto mb-5  text-center">
       <h1 class="display-4">Work Counter</h1>
       </p>
-    </div>
+  </div>
+  <div class="row container">
+    <form>
+      <div class="form-group">
+        <input class="form-control" type="text" name="name" placeholder="Name">
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="password" name="password" placeholder="Password">
+      </div>
+      <div class="form-group">
+        <select class="custom-select" name="proyecto" placeholder="select">
+          <option>Seleccione Proyecto</option>
+        </select>
+      </div>
+    </form>
+  </div>
+  <hr>
+  <div  class="row">
+    <div class="col-md-5"> <input class="form-control" type="date" name="" placeholder="Fecha Inicio"></div>
+    <div class="col-md-5"><input class="form-control" type="date" name="" placeholder="Fecha Fin"></div>
+    <div class="col-md-2"><button class="btn btn-block btn-primary">Search</button></div>
+  </div>
+<hr/>
+  <div class="row">
+<?php
+require_once "admin_actions.php";
+
+foreach(all_workers_today() as $worker):
+  $w = get_worker($worker['worker']);
+  $w->jornada = get_jornada($w->id);
+?>
+    <!-- For demo purpose -->
+    
     <!-- END -->
 
-    <div class="col-xl-3 col-lg-6 mb-4">
+    <div class="col-xl-2 col-lg-4 mb-4">
       <div class="bg-white  p-5 shadow">
-        <h2 class="h6 font-weight-bold text-center mb-4">Fabian Espejo</h2>
+        <h2 class="h6 font-weight-bold text-center mb-4"><?= $w->name ?></h2>
 
         <!-- Progress bar 1 -->
         <div class="text-center">
@@ -63,29 +92,18 @@ else:
           <div class="col-6">
             <div class="h4 font-weight-bold mb-0">60%</div><span class="small text-gray">Last month</span>
           </div>
-
           <hr>
-
-          <div class="col-md-6 col-xs-12  p-3">
-          <button class="btn btn-block btn-success" id="btn-jornada-start">Iniciar</button>
-      		</div>
-      		 <div class="col-md-6 col-xs-12  p-3">
-          <button class="btn btn-block btn-danger">Finalizar</button>
-          </div>
         </div>
         <!-- END -->
       </div>
     </div>
-    <div class="col-xl-9 col-md-12">
+    <div class="col-xl-9 col-md-10">
       <div class="row">
-
-
-    <div class="col-xl-3 col-lg-6 mb-4">
-      <div class="bg-white p-3 ">
-        <h2 class="h6 font-weight-bold text-center mb-4">Jornada</h2>
-
+        <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="bg-white p-3 ">
+          <h2 class="h6 font-weight-bold text-center mb-4">Jornada</h2>
         <!-- Progress bar 3 -->
-        <div class="progress mx-auto" data-value='25' id ="counter1">
+        <div class="progress mx-auto" data-value='<?=acotar_jornada( $w->jornada->duration) ?>' id ="counter1">
           <span class="progress-left">
                         <span class="progress-bar border-success"></span>
           </span>
@@ -101,7 +119,7 @@ else:
         <!-- Demo info -->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
-            <div class="h4 font-weight-bold mb-0">07:11</div><span class="small text-gray">Inicio de Jornada</span>
+            <div class="h4 font-weight-bold mb-0"><?=  $w->jornada->start_at ?></div><span class="small text-gray">Inicio de Jornada</span>
           </div>
           <div class="col-6">
             <div class="h4 font-weight-bold mb-0">60%</div><span class="small text-gray">Last month</span>
@@ -110,13 +128,12 @@ else:
         <!-- END -->
       </div>
     </div>
-
     <div class="col-xl-3 col-lg-6 mb-4">
       <div class="bg-white rounded-lg p-3 ">
         <h2 class="h6 font-weight-bold text-center mb-4">Horas Trabajadas</h2>
 
         <!-- Progress bar 4 -->
-        <div class="progress mx-auto" data-value='12'>
+        <div class="progress mx-auto" data-value='<?= acotar_jornada( $w->jornada->duration) ?>'>
           <span class="progress-left">
                         <span class="progress-bar border-warning"></span>
           </span>
@@ -127,9 +144,6 @@ else:
             <div class="h2 font-weight-bold">12<sup class="small">%</sup></div>
           </div>
         </div>
-        <!-- END -->
-
-        <!-- Demo info -->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
             <div class="h4 font-weight-bold mb-0">28%</div><span class="small text-gray">Last week</span>
@@ -147,7 +161,7 @@ else:
         <h2 class="h6 font-weight-bold text-center mb-4">Hora en Pausa</h2>
 
         <!-- Progress bar 2 -->
-        <div class="progress mx-auto" data-value='25'>
+        <div class="progress mx-auto" data-value='<?=  acotar_jornada(get_horas_pausa($w->id))  ?>'>
           <span class="progress-left">
                         <span class="progress-bar border-danger"></span>
           </span>
@@ -155,7 +169,7 @@ else:
                         <span class="progress-bar border-danger"></span>
           </span>
           <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-            <div class="h2 font-weight-bold">25<sup class="small">%</sup></div>
+            <div class="h2 font-weight-bold"><?=  number_format((100 * get_horas_pausa($w->id)) / (8*3600),1)  ?><sup class="small">%</sup></div>
           </div>
         </div>
         <!-- END -->
@@ -172,22 +186,7 @@ else:
         <!-- END -->
       </div>
     </div>
-  </div>
-  <div class="row">
-     <div class="col-xs-12 col-md-12">
-    <h3>Pausas </h3>
-  </div>
-    <div class="col-md-12">
-<?php
-  $stmt = $conn->prepare("select * from event_types");
-  $stmt->execute();
-  foreach ($stmt->fetchAll() as $key => $value):
-?>
-  <button class="btn btn-warning btn-pausa <?= $value['class']?>" type="<?= $value['id'] ?>" ><?=  $value['description'] ?> </button>
-<?php
-  endforeach;
-?>
-</div>
+  <?php endforeach; ?>
   </div>
 </div>
 </div>
@@ -195,6 +194,6 @@ else:
 <?php 
 endif;
 ?>
-<script type="text/javascript" src="js/custom.js?8"></script>
+<script type="text/javascript" src="js/custom.js?12"></script>
 </body>
 </html>
