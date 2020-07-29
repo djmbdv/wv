@@ -1,6 +1,7 @@
 <?php
 include "con.php";
 require_once  "auth.php";
+require_once "admin_actions.php";
   if(!is_login()){
     header('location: login.php');
     die();
@@ -30,7 +31,6 @@ require_once  "auth.php";
 
 <?php
 
-
 if(!ami_admin()):
   include_once "view_worker.php";
 else:
@@ -41,49 +41,77 @@ else:
       </p>
   </div>
   <div class="row container">
+    <div class="col-md-6">
+      <h6>Add Project</h6>
+      <form>
+        <div class="form-group">
+          <input type="text" class="form-control" name="title" placeholder="Name">
+        </div>
+        <div class="form-group">
+          <textarea class="form-control" placeholder="Description"></textarea>
+        </div>
+        <button type="submit" class="btn-primary btn">Add Project</button>
+      </form>
+    </div>
+    <div class="col-md-6">
     <form>
+      <h6 class="">Add Worker</h6>
       <div class="form-group">
         <input class="form-control" type="text" name="name" placeholder="Name">
       </div>
+      
       <div class="form-group">
         <input class="form-control" type="password" name="password" placeholder="Password">
       </div>
       <div class="form-group">
+        <input class="form-control" type="password" name="repassword" placeholder="Retype Password">
+      </div>
+      <div class="form-group">
         <select class="custom-select" name="proyecto" placeholder="select">
           <option>Seleccione Proyecto</option>
+<?php
+  foreach (projects() as $p):?>
+  <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
+<?php endforeach; ?>
         </select>
       </div>
+      <button class="btn btn-primary" type="submit">Add Worker</button>
     </form>
+  </div>
   </div>
   <hr>
   <div  class="row">
-    <div class="col-md-5"> <input class="form-control" type="date" name="" placeholder="Fecha Inicio"></div>
-    <div class="col-md-5"><input class="form-control" type="date" name="" placeholder="Fecha Fin"></div>
+    <div class="col-md-3">
+      <select class="custom-select" name="proyecto" placeholder="select">
+          <option>All</option>
+<?php
+  foreach (projects() as $p):?>
+  <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
+<?php endforeach; ?>
+        </select></div>
+    <div class="col-md-3"> <input class="form-control" type="date" name="" placeholder="Fecha Inicio"></div>
+    <div class="col-md-3"><input class="form-control" type="date" name="" placeholder="Fecha Fin"></div>
     <div class="col-md-2"><button class="btn btn-block btn-primary">Search</button></div>
   </div>
 <hr/>
   <div class="row">
 <?php
-require_once "admin_actions.php";
+
 
 foreach(all_workers_today() as $worker):
   $w = get_worker($worker['worker']);
   $w->jornada = get_jornada($w->id);
 ?>
     <!-- For demo purpose -->
-    
     <!-- END -->
-
     <div class="col-xl-2 col-lg-4 mb-4">
       <div class="bg-white  p-5 shadow">
         <h2 class="h6 font-weight-bold text-center mb-4"><?= $w->name ?></h2>
-
         <!-- Progress bar 1 -->
         <div class="text-center">
        <img class="img img-responsive " src="img/logo.png">
        </div>
         <!-- END -->
-
         <!-- Demo info -->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
@@ -119,10 +147,10 @@ foreach(all_workers_today() as $worker):
         <!-- Demo info -->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
-            <div class="h4 font-weight-bold mb-0"><?=  $w->jornada->start_at ?></div><span class="small text-gray">Inicio de Jornada</span>
+            <div class="font-weight-bold mb-0" style="font-size: 1rem;" ><?= $w->jornada->start_at ?></div><span class="small text-gray">Inicio</span>
           </div>
           <div class="col-6">
-            <div class="h4 font-weight-bold mb-0">60%</div><span class="small text-gray">Last month</span>
+            <div class="font-weight-bold mb-0"><?= $w->jornada->end_at ?></div><span class="small text-gray">Last month</span>
           </div>
         </div>
         <!-- END -->
@@ -133,7 +161,7 @@ foreach(all_workers_today() as $worker):
         <h2 class="h6 font-weight-bold text-center mb-4">Horas Trabajadas</h2>
 
         <!-- Progress bar 4 -->
-        <div class="progress mx-auto" data-value='<?= acotar_jornada( $w->jornada->duration) ?>'>
+        <div class="progress mx-auto" end="" data-value='<?= acotar_jornada( $w->jornada->duration) ?>'>
           <span class="progress-left">
                         <span class="progress-bar border-warning"></span>
           </span>
@@ -169,7 +197,7 @@ foreach(all_workers_today() as $worker):
                         <span class="progress-bar border-danger"></span>
           </span>
           <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-            <div class="h2 font-weight-bold"><?=  number_format((100 * get_horas_pausa($w->id)->horas_pausa) / (8*3600),1)  ?><sup class="small">%</sup></div>
+            <div class="font-weight-bold"><?=  number_format((100 * get_horas_pausa($w->id)->horas_pausa) / (8*3600),1)  ?><sup class="small">%</sup></div>
           </div>
         </div>
         <!-- END -->
@@ -177,7 +205,7 @@ foreach(all_workers_today() as $worker):
         <!-- Demo info-->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
-            <div class="h4 font-weight-bold mb-0"><?= get_horas_pausa($w->id)->num_pausas ?></div><span class="small text-gray">Pausas Hoy</span>
+            <div class="h4 font-weight-bold mb-0"><?= get_horas_pausa($w->id)->num_pausas ?></div><span class="small text-gray">Pausas</span>
           </div>
           <div class="col-6">
             <div class="h4 font-weight-bold mb-0">60%</div><span class="small text-gray">Mayor Pausa</span>
