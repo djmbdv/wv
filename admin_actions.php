@@ -26,11 +26,7 @@ function get_jornada($id){
 			end_at is null,
 			time_to_sec(
 				TIMEDIFF(
-					IF(
-						time(current_timestamp()) > time('18:00:00'),
-						time('18:00:00'),
-						time(current_timestamp()
-					),
+					time(current_timestamp()) ,
 					time(start_at)
 				)
 			),
@@ -55,6 +51,35 @@ function get_horas_pausa($id){
 	return $stmt->fetchObject();
 }
 
+function get_horas_pause_range($date_start, $date_end, $id){
+	global $conn;
+	$stmt = $conn->prepare("
+	select sum(
+			if(
+				end_at is null,
+				time_to_sec(
+					TIMEDIFF( 
+						time(
+							current_timestamp()
+						),
+						time(start_at)
+					)
+				),
+				time_to_sec(
+					TIMEDIFF(
+						time(end_at),
+						time(start_at)
+					)
+				)
+			)
+		) as horas_pausa, count(id) as num_pausas, date(start_at) as fecha  from events where worker = :id and type <> '0' group by fecha having fecha > :f");
+
+
+	$stmt->bindParam(":id",$id);
+	$stmt->bindParam(":f", $date_start);
+	$stmt->execute();
+	return $stmt->fetchAll();
+}
 
 function add_proyect($name, $description){
 	global $conn;

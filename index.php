@@ -6,6 +6,9 @@ require_once "admin_actions.php";
     header('location: login.php');
     die();
   }
+
+$t = get_horas_pause_range("2020-07-01","",1);
+print_r($t);
 ?>
 <!DOCTYPE html>
 <html>
@@ -102,8 +105,6 @@ foreach(all_workers_today() as $worker):
   $w = get_worker($worker['worker']);
   $w->jornada = get_jornada($w->id);
 ?>
-    <!-- For demo purpose -->
-    <!-- END -->
     <div class="col-xl-2 col-lg-4 mb-4">
       <div class="bg-white  p-5 shadow">
         <h2 class="h6 font-weight-bold text-center mb-4"><?= $w->name ?></h2>
@@ -111,8 +112,6 @@ foreach(all_workers_today() as $worker):
         <div class="text-center">
        <img class="img img-responsive " src="img/logo.png">
        </div>
-        <!-- END -->
-        <!-- Demo info -->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
             <div class="h4 font-weight-bold mb-0">28%</div><span class="small text-gray">Last week</span>
@@ -122,7 +121,6 @@ foreach(all_workers_today() as $worker):
           </div>
           <hr>
         </div>
-        <!-- END -->
       </div>
     </div>
     <div class="col-xl-9 col-md-10">
