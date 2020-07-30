@@ -145,21 +145,27 @@ function get_horas_pause_range($date_start, $date_end, $id){
 function big_pause_range($start_at, $end_at, $id){
 
 }
-function add_proyect($name, $description){
+function add_project($name, $description){
 	global $conn;
-	$stmt = $conn->prepare("insert into table projects (name,description) values (:name,:description)");
+	$stmt = $conn->prepare("INSERT INTO `projects` (`id`, `name`, `create_at`, `description`) VALUES (NULL, :name, current_timestamp(), :description)");
 	$stmt->bindParam(":name",$name);
 	$stmt->bindParam(":description",$description);
+	$stmt->execute();
 	return 0;
 }
 
 
-function add_worker($name, $password, $project){
+function add_worker($name, $password,$email, $project, $username){
 	global $conn;
-	$stmt =  $conn->prepare("insert into table workers values (name,password,project) values (:name, :password, :project)");
+	$stmt =  $conn->prepare("INSERT INTO `workers` (`id`, `name`, `email`, `created_at`, `username`, `password`, `current_project`) VALUES (NULL, :name,:email, current_timestamp(), :username, :password, :project);");
 	$stmt->bindParam(":name",$name);
-	$stmt->bindParam(":password", password_hash($password,password_algos()[0]));
+	$p = password_hash($password,password_algos()[0]);
+	$stmt->bindParam(":password", $p );
 	$stmt->bindParam(":project", $project);
+	$stmt->bindParam(":email", $email);
+	$stmt->bindParam(":username",$username);
+	$stmt->execute();
+	echo "listo";
 	return true;
 }
 function get_event_diff(){

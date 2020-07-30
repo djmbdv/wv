@@ -40,7 +40,6 @@ if(!ami_admin()):
 else:
   $start = isset($_POST['start_date'])?  $_POST['start_date']: date("Y-m-d");
   $end =   isset($_POST['end_date'])?  $_POST['end_date']: date("Y-m-d");
-  echo "$start";
  ?>
 <div class="container py-5">
   <div class="col-lg-12 mx-auto mb-5  text-center">
@@ -51,25 +50,29 @@ else:
     <div class="col-md-6">
       <h6>Add Project</h6>
       <form method="post" action="end.php">
+        <input type="hidden" name="action" value="add_project">
         <div class="form-group">
-          <input type="text" class="form-control" name="title" placeholder="Name" required="">
+          <input type="text" class="form-control" name="name" placeholder="Title" required="">
         </div>
         <div class="form-group">
-          <textarea class="form-control" placeholder="Description" required="">
-            
-          </textarea>
+          <textarea class="form-control" name="description" placeholder="Description" required=""></textarea>
         </div>
         <button type="submit" class="btn-primary btn">Add Project</button>
       </form>
     </div>
     <div class="col-md-6">
     <form method="post" action="end.php">
-      <input type="hidden" name="action" value="">
+      <input type="hidden" name="action" value="add_worker">
       <h6 class="">Add Worker</h6>
       <div class="form-group">
         <input class="form-control" type="text" name="name" placeholder="Name" required="">
       </div>
-      
+      <div class="form-group">
+        <input class="form-control" type="email" name="email" placeholder="email" required="">
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" name="username" placeholder="username" required="">
+      </div>
       <div class="form-group">
         <input class="form-control" type="password" name="password" placeholder="Password" required="">
       </div>
@@ -77,10 +80,9 @@ else:
         <input class="form-control" type="password" name="repassword" placeholder="Retype Password" required="">
       </div>
       <div class="form-group">
-        <select class="custom-select" name="proyecto" placeholder="select" required="">
+        <select class="custom-select" name="project" placeholder="select" required="">
           <option>Seleccione Proyecto</option>
 <?php
-print_r(get_jornada_range($start,$end,1));
   foreach (projects() as $p):?>
   <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
 <?php endforeach; ?>
@@ -91,6 +93,10 @@ print_r(get_jornada_range($start,$end,1));
   </div>
   </div>
   <hr>
+<?php 
+$pp =  isset($_POST["project"])?intval($_POST["project"]):0;
+?>
+
   <form method="post">
   <div  class="row">
     
@@ -98,8 +104,9 @@ print_r(get_jornada_range($start,$end,1));
       <select class="custom-select" name="project" placeholder="select">
           <option value="0">All</option>
 <?php
+
   foreach (projects() as $p):?>
-  <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
+  <option value="<?= $p['id'] ?>" <?= ($pp == $p['id'])?'selected':'' ?>><?= $p['name'] ?></option>
 <?php endforeach; ?>
         </select></div>
     <div class="col-md-3"> <input class="form-control" type="date" name="start_date" placeholder="Fecha Inicio" value="<?= $start ?>"></div>
@@ -224,7 +231,7 @@ foreach($workers as $worker):
         <!-- END -->
       </div>
     </div>
-        <div class="col-xl-3 col-lg-6 mb-4">
+        <div class="col-xl-3  mb-4">
 
 
       <div class="bg-white  p-3 ">
@@ -257,7 +264,15 @@ foreach($workers as $worker):
         <!-- END -->
       </div>
     </div>
+    <div class="col-xl-3  mb-4">
+       <div class="bg-white  p-3 ">
+        <p>
+          Nota: La Jornada es de 8 horas.
+        </p>
+       </div>
+    </div>
   </div>
+</div>
   <?php endforeach; 
   ?>
   </div>
