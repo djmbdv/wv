@@ -9,11 +9,10 @@ if(isset($_POST['action'])){
 			$password = $_POST["password"];
 			$repass = $_POST["repassword"];
 			$name = $_POST["name"];
-			$project = $_POST["project"];
 			$email = $_POST["email"];
 			$username = $_POST["username"];
 			if($password == $repass){
-				add_worker($name,$password,$email,$project,$username);
+				add_worker($name,$password,$email,$username);
 			}
 
 			break;

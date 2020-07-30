@@ -38,7 +38,7 @@ function all_workers(){
 
 function get_worker($id){
 	global $conn;
-	$stmt = $conn->prepare("select * from workers where id = :id ");
+	$stmt = $conn->prepare("select workers.id as id ,workers.name as name, projects.name as project from workers left join projects on workers.current_project =  projects.id where workers.id = :id ");
 	$stmt->bindParam(":id", $id);
 	$stmt->execute();
 	return $stmt->fetchObject();
@@ -155,13 +155,12 @@ function add_project($name, $description){
 }
 
 
-function add_worker($name, $password,$email, $project, $username){
+function add_worker($name, $password,$email,  $username){
 	global $conn;
-	$stmt =  $conn->prepare("INSERT INTO `workers` (`id`, `name`, `email`, `created_at`, `username`, `password`, `current_project`) VALUES (NULL, :name,:email, current_timestamp(), :username, :password, :project);");
+	$stmt =  $conn->prepare("INSERT INTO `workers` (`id`, `name`, `email`, `created_at`, `username`, `password`, `current_project`) VALUES (NULL, :name,:email, current_timestamp(), :username, :password, NULL);");
 	$stmt->bindParam(":name",$name);
 	$p = password_hash($password,password_algos()[0]);
 	$stmt->bindParam(":password", $p );
-	$stmt->bindParam(":project", $project);
 	$stmt->bindParam(":email", $email);
 	$stmt->bindParam(":username",$username);
 	$stmt->execute();
@@ -185,3 +184,9 @@ function projects(){
 	return $stmt->fetchAll();
 }
 
+function workers(){
+	global $conn;
+	$stmt = $conn->prepare("select * from workers");
+	$stmt->execute();
+	return $stmt->fetchAll();
+}
