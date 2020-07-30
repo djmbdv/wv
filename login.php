@@ -17,13 +17,8 @@
 </head>
 <body>
 
-<!------ Include the above in your HEAD tag ---------->
-
 <div class="wrapper fadeInDown">
   <div id="formContent">
-    <!-- Tabs Titles -->
-
-    <!-- Icon -->
     <div class="fadeIn first">
       <img src="img/logo.png" style="width: 12rem;" id="icon" alt="User Icon" />
     </div>
@@ -39,7 +34,6 @@
     <div id="formFooter">
       <a class="underlineHover" href="#">Forgot Password?</a>
     </div>
-
   </div>
 </div>
 <style type="text/css">

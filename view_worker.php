@@ -34,14 +34,10 @@
 </div>
 <div class="container py-5">
   <div class="row">
-
-    <!-- For demo purpose -->
     <div class="col-lg-12 mx-auto mb-5  text-center">
       <h1 class="display-4">Work Counter</h1>
       </p>
     </div>
-    <!-- END -->
-
     <div class="col-xl-3 col-lg-6 mb-4">
       <div class="bg-white  p-5 shadow">
         <h2 class="h6 font-weight-bold text-center mb-4"><?= $_SESSION['name'] ?></h2>
@@ -73,9 +69,6 @@
     </div>
     <div class="col-xl-9 col-md-12">
       <div class="row">
-
-
-
     <div class="col-xl-3 col-lg-6 mb-4">
       <div class="bg-white rounded-lg p-3 ">
         <h2 class="h6 font-weight-bold text-center mb-4">Jornada</h2>
@@ -107,7 +100,6 @@
       <ul class="list-group" id="list-events" style="overflow-y: scroll; height: 300px;">
         <?php list_actions_today(); ?>
       </ul>
-
 </div>
    
   </div>
@@ -156,8 +148,6 @@ $(document).ready(function(){
  <?php 
 endif;
 ?>
-
-
   $("#start-jornada").click(e=>{
     $.post("actions.php",{
       event_type: 0

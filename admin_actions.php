@@ -10,6 +10,32 @@ function all_workers_today(){
 	return $res;
 }
 
+
+function cron(){
+	global $conn;
+	$stmt = $conn->prepare("update events set end_at = current_timestamp() where events.end_at is null and time(current_timestamp()) >= time('18:00:00')");
+	$stmt->execute();
+}
+
+
+
+function all_workers_by_project($project){
+	global $conn;
+	$smtm = $conn->prepare("select * from workers  ".
+	"where workers.current_project = :id_project");
+	$smtm->bindParam(":id_project",$project);
+	$smtm->execute();
+	$res = $smtm->fetchAll(); 
+	return $res;
+}
+function all_workers(){
+	global $conn;
+	$smtm = $conn->prepare("select * from workers");
+	$smtm->execute();
+	$res = $smtm->fetchAll(); 
+	return $res;
+}
+
 function get_worker($id){
 	global $conn;
 	$stmt = $conn->prepare("select * from workers where id = :id ");
@@ -41,7 +67,38 @@ function get_jornada($id){
 	$stmt->execute();
 	return $stmt->fetchObject();
 }
+function get_jornada_range($start, $end, $id){
+	global $conn;
+	$stmt  = $conn->prepare("
+		select  
+		time(start_at) as start_at,
+		time( end_at) as end_at,  
+		date(start_at) as fecha,
+		time_to_sec(TIMEDIFF(time(start_at),time('8:00:00')))   as d_jornada, 
+		TIMEDIFF(time(start_at),time('8:00:00')) as t_jornada ,
+		if(
+			end_at is null,
+			time_to_sec(
+				TIMEDIFF(
+					time(current_timestamp()) ,
+					time(start_at)
+				)
+			),
+			time_to_sec(
+				TIMEDIFF(
+					time(end_at),
+					time(start_at)
+				)
+			)
+		) as duration from events where worker = :id and type = '0' and date(start_at) >= date(:f) and date(start_at) <= date(:fe) group by date(start_at), date(end_at)
+			");
+	$stmt->bindParam(":id", $id);
+	$stmt->bindParam(":f", $start);
+	$stmt->bindParam(":fe", $end);
+	$stmt->execute();
+	return $stmt->fetchAll();
 
+}
 function get_horas_pausa($id){
 	global $conn;
 	$stmt = $conn->prepare("
@@ -54,7 +111,7 @@ function get_horas_pausa($id){
 function get_horas_pause_range($date_start, $date_end, $id){
 	global $conn;
 	$stmt = $conn->prepare("
-	select sum(
+	select 
 			if(
 				end_at is null,
 				time_to_sec(
@@ -64,7 +121,7 @@ function get_horas_pause_range($date_start, $date_end, $id){
 						),
 						time(start_at)
 					)
-				),
+				),    
 				time_to_sec(
 					TIMEDIFF(
 						time(end_at),
@@ -72,15 +129,22 @@ function get_horas_pause_range($date_start, $date_end, $id){
 					)
 				)
 			)
-		) as horas_pausa, count(id) as num_pausas, date(start_at) as fecha  from events where worker = :id and type <> '0' group by fecha having fecha > :f");
+		 as pausa,
+	  date(start_at) as fecha  
+
+	  from events where worker = :id and type <> '0' 
+	  and date(start_at) >= date(:f) and date(start_at) <= date(:fe)");
 
 
 	$stmt->bindParam(":id",$id);
 	$stmt->bindParam(":f", $date_start);
+	$stmt->bindParam(":fe", $date_end);
 	$stmt->execute();
 	return $stmt->fetchAll();
 }
+function big_pause_range($start_at, $end_at, $id){
 
+}
 function add_proyect($name, $description){
 	global $conn;
 	$stmt = $conn->prepare("insert into table projects (name,description) values (:name,:description)");
@@ -114,3 +178,4 @@ function projects(){
 	$stmt->execute();
 	return $stmt->fetchAll();
 }
+

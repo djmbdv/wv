@@ -2,20 +2,21 @@
 include "con.php";
 require_once  "auth.php";
 require_once "admin_actions.php";
+cron();
+
   if(!is_login()){
     header('location: login.php');
     die();
   }
 
-$t = get_horas_pause_range("2020-07-01","",1);
-print_r($t);
+
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<title>Work Counter</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<link rel="stylesheet" href="css/custom.css?43">
+	<link rel="stylesheet" href="css/custom.css?45">
   <script
   src="https://code.jquery.com/jquery-3.5.1.min.js"
   integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
@@ -37,6 +38,9 @@ print_r($t);
 if(!ami_admin()):
   include_once "view_worker.php";
 else:
+  $start = isset($_POST['start_date'])?  $_POST['start_date']: date("Y-m-d");
+  $end =   isset($_POST['end_date'])?  $_POST['end_date']: date("Y-m-d");
+  echo "$start";
  ?>
 <div class="container py-5">
   <div class="col-lg-12 mx-auto mb-5  text-center">
@@ -46,33 +50,37 @@ else:
   <div class="row container">
     <div class="col-md-6">
       <h6>Add Project</h6>
-      <form>
+      <form method="post" action="end.php">
         <div class="form-group">
-          <input type="text" class="form-control" name="title" placeholder="Name">
+          <input type="text" class="form-control" name="title" placeholder="Name" required="">
         </div>
         <div class="form-group">
-          <textarea class="form-control" placeholder="Description"></textarea>
+          <textarea class="form-control" placeholder="Description" required="">
+            
+          </textarea>
         </div>
         <button type="submit" class="btn-primary btn">Add Project</button>
       </form>
     </div>
     <div class="col-md-6">
-    <form>
+    <form method="post" action="end.php">
+      <input type="hidden" name="action" value="">
       <h6 class="">Add Worker</h6>
       <div class="form-group">
-        <input class="form-control" type="text" name="name" placeholder="Name">
+        <input class="form-control" type="text" name="name" placeholder="Name" required="">
       </div>
       
       <div class="form-group">
-        <input class="form-control" type="password" name="password" placeholder="Password">
+        <input class="form-control" type="password" name="password" placeholder="Password" required="">
       </div>
       <div class="form-group">
-        <input class="form-control" type="password" name="repassword" placeholder="Retype Password">
+        <input class="form-control" type="password" name="repassword" placeholder="Retype Password" required="">
       </div>
       <div class="form-group">
-        <select class="custom-select" name="proyecto" placeholder="select">
+        <select class="custom-select" name="proyecto" placeholder="select" required="">
           <option>Seleccione Proyecto</option>
 <?php
+print_r(get_jornada_range($start,$end,1));
   foreach (projects() as $p):?>
   <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
 <?php endforeach; ?>
@@ -83,27 +91,36 @@ else:
   </div>
   </div>
   <hr>
+  <form method="post">
   <div  class="row">
+    
     <div class="col-md-3">
-      <select class="custom-select" name="proyecto" placeholder="select">
-          <option>All</option>
+      <select class="custom-select" name="project" placeholder="select">
+          <option value="0">All</option>
 <?php
   foreach (projects() as $p):?>
   <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
 <?php endforeach; ?>
         </select></div>
-    <div class="col-md-3"> <input class="form-control" type="date" name="" placeholder="Fecha Inicio"></div>
-    <div class="col-md-3"><input class="form-control" type="date" name="" placeholder="Fecha Fin"></div>
+    <div class="col-md-3"> <input class="form-control" type="date" name="start_date" placeholder="Fecha Inicio" value="<?= $start ?>"></div>
+    <div class="col-md-3"><input class="form-control" type="date" name="end_date" placeholder="Fecha Fin" value="<?= $end ?>"></div>
     <div class="col-md-2"><button class="btn btn-block btn-primary">Search</button></div>
+  
   </div>
+  </form>
 <hr/>
   <div class="row">
 <?php
+$t = get_horas_pause_range("2020-07-01","2020-07-30",1);
+if(isset($_POST["project"]) &&  $_POST["project"] != '0'){
+  $workers =  all_workers_by_project($_POST["project"]);
+}else{
+  $workers = all_workers();
+}
 
-
-foreach(all_workers_today() as $worker):
-  $w = get_worker($worker['worker']);
-  $w->jornada = get_jornada($w->id);
+foreach($workers as $worker):
+  $w = get_worker($worker['id']);
+  $w->jornada = get_jornada_range($start,$end,$w->id);
 ?>
     <div class="col-xl-2 col-lg-4 mb-4">
       <div class="bg-white  p-5 shadow">
@@ -129,7 +146,14 @@ foreach(all_workers_today() as $worker):
         <div class="bg-white p-3 ">
           <h2 class="h6 font-weight-bold text-center mb-4">Jornada</h2>
         <!-- Progress bar 3 -->
-        <div class="progress mx-auto" data-value='<?=acotar_jornada( $w->jornada->duration) ?>' id ="counter1">
+<?php
+  $duracion = 0.0;
+  foreach ($w->jornada as $j) {
+    $duracion += intval($j['duration']);
+  }
+  $porcentaje_duracion =count($w->jornada) > 0 ? $duracion / (count($w->jornada) * 8 * 36) : 0;
+?>
+        <div class="progress2 mx-auto" data-value='<?= $porcentaje_duracion ?>' >
           <span class="progress-left">
                         <span class="progress-bar border-success"></span>
           </span>
@@ -137,29 +161,48 @@ foreach(all_workers_today() as $worker):
                         <span class="progress-bar border-success"></span>
           </span>
           <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-            <div class="h2 font-weight-bold" > <spam id = "counter1-label"> </spam><small>S</small></div>
+            <div class="h2 font-weight-bold" >
+              <?php if(count($w->jornada ) < 1): ?>
+              <small>Sin Jornada</small> 
+              <?php else: ?> 
+                   <?= ($duracion > 3600)?number_format($duracion / 3600.0, 1): number_format($duracion / 60.0, 0)?><small><?=($duracion > 3600)?'H': 'm'?></small>
+            <?php endif ?>
+              </div>
+            </div>
           </div>
-        </div>
         <!-- END -->
 
         <!-- Demo info -->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
-            <div class="font-weight-bold mb-0" style="font-size: 1rem;" ><?= $w->jornada->start_at ?></div><span class="small text-gray">Inicio</span>
+            <div class="font-weight-bold mb-0" style="font-size: 1rem;" ><?= count($w->jornada) ?></div><span class="small text-gray"># Jornadas</span>
           </div>
           <div class="col-6">
-            <div class="font-weight-bold mb-0"><?= $w->jornada->end_at ?></div><span class="small text-gray">Last month</span>
+
+            <div class="font-weight-bold mb-0"><?= number_format($porcentaje_duracion,2) ?></div><span class="small text-gray">% de tiempo</span>
           </div>
         </div>
         <!-- END -->
       </div>
-    </div>
+      </div>
     <div class="col-xl-3 col-lg-6 mb-4">
+<?php 
+  $pausas = get_horas_pause_range($start,$end, $w->id);
+  $tiempo_pausa = 0.0;
+  $num_pausas = 0;
+  foreach ($pausas as $pausas) {
+    $tiempo_pausa += intval($pausas["pausa"]);
+    $num_pausas++;
+  }
+  $porcentaje_pausa = ($duracion > 0)? $tiempo_pausa * 100 / $duracion: 0;
+  $porcentaje_trabajo =count($w->jornada) > 0? ($duracion - $tiempo_pausa) / ((8*36)*count($w->jornada)):0;
+
+?>
       <div class="bg-white rounded-lg p-3 ">
         <h2 class="h6 font-weight-bold text-center mb-4">Horas Trabajadas</h2>
 
         <!-- Progress bar 4 -->
-        <div class="progress mx-auto" end="" data-value='<?= acotar_jornada( $w->jornada->duration) ?>'>
+        <div class="progress2 mx-auto" end="" data-value='<?= number_format($porcentaje_trabajo,2) ?>'>
           <span class="progress-left">
                         <span class="progress-bar border-warning"></span>
           </span>
@@ -167,7 +210,7 @@ foreach(all_workers_today() as $worker):
                         <span class="progress-bar border-warning"></span>
           </span>
           <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-            <div class="h2 font-weight-bold">12<sup class="small">%</sup></div>
+            <div class="h2 font-weight-bold"><?= number_format($porcentaje_trabajo,2) ?><sup class="small">%</sup></div>
           </div>
         </div>
         <div class="row text-center mt-4">
@@ -182,12 +225,14 @@ foreach(all_workers_today() as $worker):
       </div>
     </div>
         <div class="col-xl-3 col-lg-6 mb-4">
+
+
       <div class="bg-white  p-3 ">
 
         <h2 class="h6 font-weight-bold text-center mb-4">Hora en Pausa</h2>
 
         <!-- Progress bar 2 -->
-        <div class="progress mx-auto" data-value='<?=  acotar_jornada(get_horas_pausa($w->id)->horas_pausa)  ?>'>
+        <div class="progress2 mx-auto" data-value='<?=  number_format($porcentaje_pausa,2)  ?>'>
           <span class="progress-left">
                         <span class="progress-bar border-danger"></span>
           </span>
@@ -195,7 +240,7 @@ foreach(all_workers_today() as $worker):
                         <span class="progress-bar border-danger"></span>
           </span>
           <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-            <div class="font-weight-bold"><?=  number_format((100 * get_horas_pausa($w->id)->horas_pausa) / (8*3600),1)  ?><sup class="small">%</sup></div>
+            <div class="h2 font-weight-bold"><?=  number_format($porcentaje_pausa,2)  ?><sup class="small">%</sup></div>
           </div>
         </div>
         <!-- END -->
@@ -203,7 +248,7 @@ foreach(all_workers_today() as $worker):
         <!-- Demo info-->
         <div class="row text-center mt-4">
           <div class="col-6 border-right">
-            <div class="h4 font-weight-bold mb-0"><?= get_horas_pausa($w->id)->num_pausas ?></div><span class="small text-gray">Pausas</span>
+            <div class="h4 font-weight-bold mb-0"><?= $num_pausas ?></div><span class="small text-gray">Pausas</span>
           </div>
           <div class="col-6">
             <div class="h4 font-weight-bold mb-0">60%</div><span class="small text-gray">Mayor Pausa</span>
@@ -212,7 +257,9 @@ foreach(all_workers_today() as $worker):
         <!-- END -->
       </div>
     </div>
-  <?php endforeach; ?>
+  </div>
+  <?php endforeach; 
+  ?>
   </div>
 </div>
 </div>
@@ -220,6 +267,6 @@ foreach(all_workers_today() as $worker):
 <?php 
 endif;
 ?>
-<script type="text/javascript" src="js/custom.js?12"></script>
+<script type="text/javascript" src="js/custom.js?16"></script>
 </body>
 </html>
