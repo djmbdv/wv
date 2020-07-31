@@ -140,7 +140,6 @@ $pp =  isset($_POST["project"])?intval($_POST["project"]):0;
 <hr/>
   <div class="row">
 <?php
-$t = get_horas_pause_range("2020-07-01","2020-07-30",1);
 if(isset($_POST["project"]) &&  $_POST["project"] != '0'){
   $workers =  all_workers_by_project($_POST["project"]);
 }else{
@@ -293,9 +292,8 @@ foreach($workers as $worker):
        </div>
         <div class="bg-white  p-3 ">
         <div class="row">
-          <button class="btn btn-danger btn-block">Leave from project</button>
-
-          <button class="btn btn-warning btn-block mt-2">Edit</button>
+          <button data-project="<?= $w->id ?>" class="btn-leave btn btn-danger btn-block">Leave from project</button>
+          <button data-project="3" class="btn-edit btn btn-warning btn-block mt-2">Edit</button>
         </div>
        </div>
     </div>
@@ -310,6 +308,17 @@ foreach($workers as $worker):
 <?php 
 endif;
 ?>
-<script type="text/javascript" src="js/custom.js?16"></script>
+<script type="text/javascript">
+  $(".btn-edit").click(e=> {
+   var a = $(e.srcElement).attr("data-project");
+   console.log(e);
+  });
+    $(".btn-leave").click(e=> {
+   var a = $(e.srcElement).attr("data-project");
+   console.log(e);
+  });
+</script>
+<script type="text/javascript" src="js/custom.js?21"></script>
+
 </body>
 </html>

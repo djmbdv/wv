@@ -30,7 +30,7 @@ function all_workers_by_project($project){
 }
 function all_workers(){
 	global $conn;
-	$smtm = $conn->prepare("select * from workers");
+	$smtm = $conn->prepare("SELECT * from workers where current_project is not NULL");
 	$smtm->execute();
 	$res = $smtm->fetchAll(); 
 	return $res;

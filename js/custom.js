@@ -61,3 +61,4 @@ function stop(){
 $("#btn-jornada-star").click(e=>{
 
 });
+
