@@ -76,23 +76,23 @@ else:
   <div class="form-group">
 
     <label for="exampleInputEmail1">Name</label>
-    <input type="text" class="form-control form-control-modal" id="modal-input-name" placeholder="Your name">
+    <input type="text" class="form-control form-control-modal" name="name" id="modal-input-name" placeholder="Your name">
   </div>
                  <div class="form-group">
     <label for="exampleInputEmail1">Username</label>
-    <input type="username" class="form-control form-control-modal" id="modal-input-username" placeholder="Enter username">
+    <input type="text" class="form-control form-control-modal" name="username" id="modal-input-username" placeholder="Enter username">
   </div>
          <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
-    <input type="email" class="form-control form-control-modal" id="modal-input-email" placeholder="Enter email">
+    <input type="email" class="form-control form-control-modal" name="email" id="modal-input-email" placeholder="Enter email">
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control form-control-modal" id="modal-input-password" placeholder="Password">
+    <input type="password" class="form-control form-control-modal" name="password" id="modal-input-password" placeholder="Password">
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Confirm Password</label>
-    <input type="password" class="form-control form-control-modal" id="modal-input-repassword"  placeholder="Password">
+    <input type="password" class="form-control form-control-modal" name="repassword" id="modal-input-repassword"  placeholder="Password">
   </div>
       </div>
       <div class="modal-footer">

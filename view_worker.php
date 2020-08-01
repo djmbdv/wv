@@ -82,7 +82,7 @@
                         <span class="progress-bar border-warning"></span>
           </span>
           <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-            <div class="h2 font-weight-bold"><?= date("h:i:sa") ?></div>
+            <div class="h6 font-weight-bold"><?= date("h:i:sa") ?></div>
           </div>
         </div>
         <!-- END -->

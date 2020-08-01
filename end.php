@@ -52,7 +52,7 @@ if(isset($_POST['action'])){
 				die();
 			}
 			edit_worker($worker, $name, $username, $email ,$password);
-			echo 1;
+			header("location: .");
 	}
 
 }

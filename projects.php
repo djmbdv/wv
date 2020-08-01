@@ -35,17 +35,7 @@ require_once "admin_actions.php";
   </div>
   <div class="row container">
     <div class="col-md-6">
-      <h6>Add Project</h6>
-      <form>
-        <div class="form-group">
-          <input type="text" class="form-control" name="title" placeholder="Name">
-        </div>
-        <div class="form-group">
-          <textarea class="form-control" placeholder="Description"></textarea>
-        </div>
-        <button type="submit" class="btn-primary btn">Add Project</button>
-      </form>
-    </div>
+
     <div class="col-md-6">
     </div>
   </div>

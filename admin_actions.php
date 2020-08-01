@@ -213,3 +213,14 @@ function data_worker($id){
 	$stmt->execute();
 	return json_encode($stmt->fetchObject());
 }
+function edit_worker($id, $name, $username, $email, $password){
+	global $conn;
+	$stmt = $conn->prepare("UPDATE workers  set name = :name, username = :username, email = :email, password = :password where id = :id");
+	$stmt->bindParam(":name",$name);
+	$p = password_hash($password,password_algos()[0]);
+	$stmt->bindParam(":password", $p );
+	$stmt->bindParam(":email", $email);
+	$stmt->bindParam(":username",$username);
+	$stmt->bindParam(":id", $id);
+	$stmt->execute();
+}
