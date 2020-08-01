@@ -142,9 +142,6 @@ function get_horas_pause_range($date_start, $date_end, $id){
 	$stmt->execute();
 	return $stmt->fetchAll();
 }
-function big_pause_range($start_at, $end_at, $id){
-
-}
 function add_project($name, $description){
 	global $conn;
 	$stmt = $conn->prepare("INSERT INTO `projects` (`id`, `name`, `create_at`, `description`) VALUES (NULL, :name, current_timestamp(), :description)");
@@ -179,14 +176,40 @@ function acotar_jornada($j){
 }
 function projects(){
 	global $conn;
-	$stmt =  $conn->prepare("select * from projects");
+	$stmt =  $conn->prepare("SELECT * from projects");
 	$stmt->execute();
 	return $stmt->fetchAll();
 }
 
 function workers(){
 	global $conn;
-	$stmt = $conn->prepare("select * from workers");
+	$stmt = $conn->prepare("SELECT * from workers");
 	$stmt->execute();
 	return $stmt->fetchAll();
+}
+function free_workers(){
+	global $conn;
+	$stmt = $conn->prepare("SELECT * from workers where current_project is null");
+	$stmt->execute();
+	return $stmt->fetchAll();
+}
+function leave_project($id){
+	global $conn;
+	$stmt = $conn->prepare("UPDATE workers set current_project = NULL where id = :id");
+	$stmt->bindParam(":id", $id);
+	$stmt->execute();
+}
+function asign_worker($id, $project){
+	global $conn;
+	$stmt = $conn->prepare("UPDATE workers set current_project = :project where id = :id");
+	$stmt->bindParam(":id", $id);
+	$stmt->bindParam(":project",$project);
+	$stmt->execute();
+}
+function data_worker($id){
+	global $conn;
+	$stmt = $conn->prepare("select * from workers where id = :id");
+	$stmt->bindParam(":id",$id);
+	$stmt->execute();
+	return json_encode($stmt->fetchObject());
 }

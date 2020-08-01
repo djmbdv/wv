@@ -41,6 +41,68 @@ else:
   $start = isset($_POST['start_date'])?  $_POST['start_date']: date("Y-m-d");
   $end =   isset($_POST['end_date'])?  $_POST['end_date']: date("Y-m-d");
  ?>
+<div class="modal modal-fade" id="modal-pop" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title-message">Leave from project</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-message">Esta seguro de quitar el trabajador de ester proyecto?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="modal-primary">S&iacute;</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal modal-fade" id="modal-edit" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="title-message">Edit Worker</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="end.php" method="post">
+      <div class="modal-body">
+         <input type="hidden" name="worker" id="modal-input-id">
+         <input type="hidden" name="action" value="edit_worker">
+  <div class="form-group">
+
+    <label for="exampleInputEmail1">Name</label>
+    <input type="text" class="form-control form-control-modal" id="modal-input-name" placeholder="Your name">
+  </div>
+                 <div class="form-group">
+    <label for="exampleInputEmail1">Username</label>
+    <input type="username" class="form-control form-control-modal" id="modal-input-username" placeholder="Enter username">
+  </div>
+         <div class="form-group">
+    <label for="exampleInputEmail1">Email address</label>
+    <input type="email" class="form-control form-control-modal" id="modal-input-email" placeholder="Enter email">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Password</label>
+    <input type="password" class="form-control form-control-modal" id="modal-input-password" placeholder="Password">
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">Confirm Password</label>
+    <input type="password" class="form-control form-control-modal" id="modal-input-repassword"  placeholder="Password">
+  </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" id="modal-save-edit">Save Changes</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
 <div class="container py-5">
   <div class="col-lg-12 mx-auto mb-5  text-center">
       <h1 class="display-4">Work Counter</h1>
@@ -84,6 +146,8 @@ else:
   </div>
   <div class="col-md-3">
     <h4>Add worker to a project</h4>
+    <form action="end.php" method="post">
+    <input type="hidden" name="action" value="asign-worker">
     <div class="form-group">
           <select class="custom-select" name="project" placeholder="Select Project" required="">
 <?php
@@ -95,12 +159,13 @@ else:
 <div class="form-group">
           <select class="custom-select" name="worker" placeholder="Select Worker" required="">
 <?php
-  foreach (workers() as $p):?>
+  foreach (free_workers() as $p):?>
   <option value="<?= $p['id'] ?>"><?= $p['name'] ?></option>
 <?php endforeach; ?>
         </select>
        </div> 
       <button class="btn btn-primary btn-block">Add</button>
+    </form>
   </div>
   <div class="col-md-3">
     <h4>Projects Details</h4>
@@ -292,8 +357,8 @@ foreach($workers as $worker):
        </div>
         <div class="bg-white  p-3 ">
         <div class="row">
-          <button data-project="<?= $w->id ?>" class="btn-leave btn btn-danger btn-block">Leave from project</button>
-          <button data-project="3" class="btn-edit btn btn-warning btn-block mt-2">Edit</button>
+          <button worker="<?= $w->id ?>" class="btn-leave btn btn-danger btn-block">Leave from project</button>
+          <button worker="<?= $w->id ?>" class="btn-edit btn btn-warning btn-block mt-2">Edit</button>
         </div>
        </div>
     </div>
@@ -310,12 +375,30 @@ endif;
 ?>
 <script type="text/javascript">
   $(".btn-edit").click(e=> {
-   var a = $(e.srcElement).attr("data-project");
-   console.log(e);
+   var a = $(e.currentTarget).attr("worker");
+   $.post("end.php",{worker:a, action:"data_worker"},(data)=>{
+    $("#modal-input-email").val(data.email);
+   $("#modal-input-name").val(data.name);
+   $("#modal-input-username").val(data.username);
+   $("#modal-input-id").val(data.id);
+    $("#modal-edit").modal('show');
+   });
+ //  
+
   });
     $(".btn-leave").click(e=> {
-   var a = $(e.srcElement).attr("data-project");
-   console.log(e);
+   var a = $(e.currentTarget).attr("worker");
+   $("#modal-pop").modal("show");
+   $("#modal-primary").attr("worker", a);
+
+  });
+
+  $("#modal-primary").click(e=>{
+    var id_worker = $(e.currentTarget).attr("worker")
+    $.post("end.php",{worker: id_worker, action:"leave_project"},(data)=>{
+      alert(data);
+      location.reload();
+    });
   });
 </script>
 <script type="text/javascript" src="js/custom.js?21"></script>
