@@ -97,8 +97,60 @@ function get_jornada_range($start, $end, $id){
 	$stmt->bindParam(":fe", $end);
 	$stmt->execute();
 	return $stmt->fetchAll();
-
 }
+
+function get_jornada_range_project($start, $end, $project){
+	global $conn;
+	$stmt  = $conn->prepare("
+		select  
+		time(start_at) as start_at,
+		time( end_at) as end_at,  
+		date(start_at) as fecha,
+		time_to_sec(TIMEDIFF(time(start_at),time('8:00:00')))   as d_jornada, 
+		TIMEDIFF(time(start_at),time('8:00:00')) as t_jornada ,
+		if(
+			end_at is null,
+			time_to_sec(
+				TIMEDIFF(
+					time(current_timestamp()) ,
+					time(start_at)
+				)
+			),
+			time_to_sec(
+				TIMEDIFF(
+					time(end_at),
+					time(start_at)
+				)
+			)
+		) as duration from events 
+		inner join workers on workers.id = events.worker
+		inner join projects on projects.id = workers.current_project
+		 where type = '0' and projects.id = :project and date(start_at) >= date(:f) and date(start_at) <= date(:fe) group by date(start_at), date(end_at)
+			");
+	$stmt->bindParam(":f", $start);
+	$stmt->bindParam(":fe", $end);
+	$stmt->bindParam(":project", $project);
+	$stmt->execute();
+	return $stmt->fetchAll();
+}
+
+
+function workers_range_project($start, $end, $project){
+		global $conn;
+	$stmt  = $conn->prepare("
+		select  distinct workers.id as workers
+	from events 
+		inner join workers on workers.id = events.worker
+		inner join projects on projects.id = workers.current_project
+		 where type = '0' and projects.id = :project and date(start_at) >= date(:f) and date(start_at) <= date(:fe) 
+			");
+	$stmt->bindParam(":f", $start);
+	$stmt->bindParam(":fe", $end);
+	$stmt->bindParam(":project", $project);
+	$stmt->execute();
+	return $stmt->fetchAll();
+}
+
 function get_horas_pausa($id){
 	global $conn;
 	$stmt = $conn->prepare("
@@ -139,6 +191,44 @@ function get_horas_pause_range($date_start, $date_end, $id){
 	$stmt->bindParam(":id",$id);
 	$stmt->bindParam(":f", $date_start);
 	$stmt->bindParam(":fe", $date_end);
+	$stmt->execute();
+	return $stmt->fetchAll();
+}
+function get_horas_pause_range_project($date_start, $date_end, $project){
+	global $conn;
+	$stmt = $conn->prepare("
+	select 
+			if(
+				end_at is null,
+				time_to_sec(
+					TIMEDIFF( 
+						time(
+							current_timestamp()
+						),
+						time(start_at)
+					)
+				),    
+				time_to_sec(
+					TIMEDIFF(
+						time(end_at),
+						time(start_at)
+					)
+				)
+			)
+		 as pausa,
+	  date(start_at) as fecha  
+
+	  from events
+	  inner join  workers on workers.id = events.worker
+	   where  type <> '0'
+	   and current_project = :project 
+	  and date(start_at) >= date(:f) and date(start_at) <= date(:fe)");
+
+
+	$stmt->bindParam(":project",$project);
+	$stmt->bindParam(":f", $date_start);
+	$stmt->bindParam(":fe", $date_end);
+	$stmt->execute();
 	$stmt->execute();
 	return $stmt->fetchAll();
 }
@@ -223,4 +313,20 @@ function edit_worker($id, $name, $username, $email, $password){
 	$stmt->bindParam(":username",$username);
 	$stmt->bindParam(":id", $id);
 	$stmt->execute();
+}
+
+function get_project($id){
+	global $conn;
+	$stmt = $conn->prepare("SELECT * from projects where id  = :id");
+	$stmt->bindParam(":id", $id);
+	$stmt->execute();
+	return $stmt->fetchObject();
+}
+
+function last_jornada($id){
+	global $conn;
+	$stmt = $conn->prepare("SELECT date(start_at) as start_at from events where worker = :id order by start_at desc limit 1");
+	$stmt->bindParam(":id", $id);
+	$stmt->execute();
+	return $stmt->fetchObject();
 }

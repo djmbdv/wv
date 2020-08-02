@@ -169,6 +169,7 @@ else:
   </div>
   <div class="col-md-3">
     <h4>Projects Details</h4>
+    <form action="projects.php">
         <select class="custom-select" name="project" placeholder="Select Project" required="">
 <?php
   foreach (projects() as $p):?>
@@ -176,7 +177,8 @@ else:
 <?php endforeach; ?>
         </select>
 
-        <button class="btn btn-primary btn-block mt-2">View</button>
+        <button class="btn btn-primary btn-block mt-2" type="submit">View</button>
+        </form>
   </div>
 </div>
   <hr>
@@ -233,7 +235,7 @@ foreach($workers as $worker):
             <div class="h4 font-weight-bold mb-0"><?=(count($w->jornada) > 0 )?number_format( $duracion/(count($w->jornada)*3600),1):0 ?>h</div><span class="small text-gray">Jornada Promedio </span>
           </div>
           <div class="col-6">
-            <div class="h4 font-weight-bold mb-0">60%</div><span class="small text-gray">Last month</span>
+            <div class=" font-weight-bold mb-0 small"><?= last_jornada($w->id)->start_at ?></div><span class="small text-gray">&Uacute;ltima Jornada</span>
           </div>
           <hr>
         </div>
